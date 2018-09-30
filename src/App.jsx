@@ -1,31 +1,30 @@
 import React, { Component } from 'react';
 
 class CreateToDo extends Component {
+
+
   render() {
     return (
-      <div className='form-group'>
-        <label>I want to...</label>
-        <input type="text" className="form-control" />
+      <div>
+        <div className='form-group'>
+          <label>I want to...</label>
+          <input onChange={this.props.handleChangeFromContainer} name='description' type="text" className="form-control" />
+        </div>
+        <div className='form-group'>
+          <label>Set Priority</label>
+          <br></br>
+          <select name='priority' onChange={this.props.handleChangeFromContainer}>
+            <option value='1'>High</option>
+            <option value='2'>Medium</option>
+            <option value='3'>Low</option>
+          </select>
+        </div>
+        <button onClick={this.props.handleClickFromContainer}>Submit</button>
       </div>
     )
   }
 }
 
-class SetPriority extends Component {
-  render() {
-    return (
-      <div className='form-group'>
-        <label>Set Priority</label>
-        <br></br>
-        <select>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-      </div>
-    )
-  }
-}
 
 class CreateToDoContainer extends Component {
   render() {
@@ -34,8 +33,11 @@ class CreateToDoContainer extends Component {
         <div className='card-body'>
           <div className='h3'>Add a New To Do Item</div>
           <br></br>
-          <CreateToDo />
-          <SetPriority />
+          <CreateToDo
+            functionFromContainer={this.props.functionFromApp}
+            handleChangeFromContainer={this.props.handleChangeFromApp}
+            handleClickFromContainer={this.props.handleClickFromApp}
+          />
         </div>
       </div>
     )
@@ -54,9 +56,9 @@ class EditToDo extends Component {
           <label>Set Priority</label>
           <br></br>
           <select>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
+            <option value='1'>High</option>
+            <option value='2'>Medium</option>
+            <option value='3'>Low</option>
           </select>
           <div className='form-group'>
             <br></br>
@@ -69,20 +71,49 @@ class EditToDo extends Component {
 
 }
 
-class ViewToDo extends Component {
-  render() {
+
+class ViewToDoContainer extends Component {
+  // how do I get it to move automatically for every item in the item array?
+
+  renderToDo() {
+    // console.log(this.props.items[0])
+
+    // this.props.items.map((e, i) => {
+    //   return (
+    //     <ul className='list-group'>
+    //       <li className='list-group-item'>
+    //         <div className='row'>
+    //           <div className='col'>
+    //             <input type='checkbox' />
+    //           </div>
+    //           <div className='col-6'>
+    //           {/* test */}
+    //             {/* {this.props.items[i].description} */}
+    //             {/* {e.description} */}
+    //             {/* {console.log(e.description)} */}
+    //           </div>
+    //           <div className='col'>
+    //             <button>Edit</button>
+    //           </div>
+    //           <div className='col'>
+    //             <button>Trash</button>
+    //           </div>
+    //         </div>
+    //       </li>
+    //     </ul>
+    //   )
+    // })
+
+
     return (
-      <ul className='list-group'>
-        <li className='list-group-item'>To Do 1
-        <EditToDo />
-        </li>
+      <div>
         <li className='list-group-item'>
           <div className='row'>
             <div className='col'>
               <input type='checkbox' />
             </div>
             <div className='col-6'>
-              To Do 2
+              {this.props.items[0].description}
             </div>
             <div className='col'>
               <button>Edit</button>
@@ -92,20 +123,21 @@ class ViewToDo extends Component {
             </div>
           </div>
         </li>
-        <li className='list-group-item'>To Do 3</li>
-      </ul>
+      </div>
     )
-  }
-}
 
-class ViewToDoContainer extends Component {
+  }
+
+
   render() {
     return (
       <div className='card'>
         <div className='card-body'>
           <div className='h3'>View To Do Items</div>
           <br></br>
-          <ViewToDo />
+          <ul className='list-group'>
+            {this.props.toggle === true ? this.renderToDo() : null}
+          </ul>
         </div>
       </div>
     )
@@ -113,6 +145,51 @@ class ViewToDoContainer extends Component {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      description: '',
+      priority: '1',
+      items: [],
+      isToggle: false,
+    }
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.toggleTable = this.toggleTable.bind(this);
+
+  }
+
+
+  handleChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+    })
+  };
+
+  handleClick() {
+    var newToDo = {
+      description: this.state.description,
+      priority: this.state.priority,
+      isShown: true,
+    };
+
+    this.setState({
+      items: this.state.items.concat(newToDo)
+    });
+
+    this.toggleTable();
+
+  };
+
+  toggleTable() {
+    this.setState({
+      isToggle: true
+    });
+
+    // console.log(this.state.items[0].description)
+  }
+
 
   render() {
     return (
@@ -126,10 +203,15 @@ class App extends Component {
         </div>
         <div className='row'>
           <div className='col'>
-            <CreateToDoContainer />
+            <CreateToDoContainer
+              handleChangeFromApp={this.handleChange}
+              handleClickFromApp={this.handleClick} />
           </div>
           <div className='col'>
-            <ViewToDoContainer />
+            <ViewToDoContainer
+              items={this.state.items}
+              toggle={this.state.isToggle}
+            />
           </div>
         </div>
       </div>
