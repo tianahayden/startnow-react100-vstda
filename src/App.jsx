@@ -50,84 +50,66 @@ class EditToDo extends Component {
       <div>
         <div className='form-group'>
           <label>Description</label>
-          <input type="text" className="form-control" />
+          <input name='description' onChange={this.props.handleChange} type="text" className="form-control" />
         </div>
         <div className='form-group'>
           <label>Set Priority</label>
           <br></br>
-          <select>
+          <select name='priority' onChange={this.props.handleChange}>
             <option value='1'>High</option>
             <option value='2'>Medium</option>
             <option value='3'>Low</option>
           </select>
           <div className='form-group'>
             <br></br>
-            <button className='btn btn-primary'>Save</button>
+            <button onClick={this.props.handleEditSubmit} className='btn btn-primary'>Save</button>
           </div>
         </div>
       </div>
     )
   }
-
 }
 
 
 class ViewToDoContainer extends Component {
-  // how do I get it to move automatically for every item in the item array?
 
   renderToDo() {
-    // console.log(this.props.items[0])
+    return this.props.items.map((e, i) => {
+      if (e.isEditing === true) {
+        return (
+          <li className='list-group-item'>
+            <EditToDo
+            handleChange={this.props.handleChange}
+            items={this.props.items}
+            handleEditSubmit={this.props.handleEditSubmit} 
+            />
+          </li>
+        )
+      }
 
-    // this.props.items.map((e, i) => {
-    //   return (
-    //     <ul className='list-group'>
-    //       <li className='list-group-item'>
-    //         <div className='row'>
-    //           <div className='col'>
-    //             <input type='checkbox' />
-    //           </div>
-    //           <div className='col-6'>
-    //           {/* test */}
-    //             {/* {this.props.items[i].description} */}
-    //             {/* {e.description} */}
-    //             {/* {console.log(e.description)} */}
-    //           </div>
-    //           <div className='col'>
-    //             <button>Edit</button>
-    //           </div>
-    //           <div className='col'>
-    //             <button>Trash</button>
-    //           </div>
-    //         </div>
-    //       </li>
-    //     </ul>
-    //   )
-    // })
+      else {
+        return (
+          <li className='list-group-item'>
+            <div className='row'>
+              <div className='col'>
+                <input type='checkbox' />
+              </div>
+              <div className='col-6'>
+                {e.description}
+              </div>
+              <div className='col'>
+                <button name={i} onClick={this.props.handleEditFromApp}>Edit</button>
+              </div>
+              <div className='col'>
+                <button>Trash</button>
+              </div>
+            </div>
+          </li>
+        )
+      }
 
-
-    return (
-      <div>
-        <li className='list-group-item'>
-          <div className='row'>
-            <div className='col'>
-              <input type='checkbox' />
-            </div>
-            <div className='col-6'>
-              {this.props.items[0].description}
-            </div>
-            <div className='col'>
-              <button>Edit</button>
-            </div>
-            <div className='col'>
-              <button>Trash</button>
-            </div>
-          </div>
-        </li>
-      </div>
-    )
-
+    })
   }
-
 
   render() {
     return (
@@ -136,7 +118,7 @@ class ViewToDoContainer extends Component {
           <div className='h3'>View To Do Items</div>
           <br></br>
           <ul className='list-group'>
-            {this.props.toggle === true ? this.renderToDo() : null}
+            {this.props.toggleTable === true ? this.renderToDo() : null}
           </ul>
         </div>
       </div>
@@ -151,13 +133,48 @@ class App extends Component {
       description: '',
       priority: '1',
       items: [],
-      isToggle: false,
+      isToggleTable: false,
+      currentIndex: '',
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.toggleTable = this.toggleTable.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.handleEditSubmit = this.handleEditSubmit.bind(this);
 
+  }
+
+  handleEditSubmit(){
+    var currentItems = this.state.items
+    var newToDo = {
+      description: this.state.description,
+      priority: this.state.priority,
+      isShown: true,
+      isEditing: false,
+    }
+    currentItems.splice((this.state.currentIndex),1,newToDo)
+
+    this.setState({
+      items: currentItems
+    })
+  }
+  
+
+  handleEdit(e) {
+    var currentItems = this.state.items
+    var editedToDo = {
+      description: this.state.items[(e.target.name)].description,
+      priority: this.state.items[(e.target.name)].priority,
+      isShown: true,
+      isEditing: true,
+    }
+    currentItems.splice((e.target.name),1,editedToDo)
+
+    this.setState({
+      items: currentItems,
+      currentIndex: e.target.name
+    })
   }
 
 
@@ -167,27 +184,25 @@ class App extends Component {
     })
   };
 
+
   handleClick() {
     var newToDo = {
       description: this.state.description,
       priority: this.state.priority,
       isShown: true,
+      isEditing: false,
     };
-
     this.setState({
       items: this.state.items.concat(newToDo)
     });
-
     this.toggleTable();
-
   };
+
 
   toggleTable() {
     this.setState({
-      isToggle: true
+      isToggleTable: true
     });
-
-    // console.log(this.state.items[0].description)
   }
 
 
@@ -210,7 +225,10 @@ class App extends Component {
           <div className='col'>
             <ViewToDoContainer
               items={this.state.items}
-              toggle={this.state.isToggle}
+              toggleTable={this.state.isToggleTable}
+              handleEditFromApp={this.handleEdit}
+              handleChange={this.handleChange}
+              handleEditSubmit={this.handleEditSubmit}
             />
           </div>
         </div>
