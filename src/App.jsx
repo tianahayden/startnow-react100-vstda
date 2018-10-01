@@ -81,7 +81,7 @@ class ViewToDoContainer extends Component {
             <EditToDo
             handleChange={this.props.handleChange}
             items={this.props.items}
-            handleEditSubmit={this.props.handleEditSubmit} 
+            handleEditSubmit={this.props.handleEditSubmit}
             />
           </li>
         )
@@ -101,7 +101,7 @@ class ViewToDoContainer extends Component {
                 <button name={i} onClick={this.props.handleEditFromApp}>Edit</button>
               </div>
               <div className='col'>
-                <button>Trash</button>
+                <button name={i} onClick={this.props.handleDelete}>Trash</button>
               </div>
             </div>
           </li>
@@ -142,6 +142,7 @@ class App extends Component {
     this.toggleTable = this.toggleTable.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
 
   }
 
@@ -175,6 +176,16 @@ class App extends Component {
       items: currentItems,
       currentIndex: e.target.name
     })
+  }
+
+  handleDelete(e) {
+    var currentItems = this.state.items
+    currentItems.splice((e.target.name),1)
+
+    this.setState({
+      items: currentItems,
+    })
+
   }
 
 
@@ -229,6 +240,7 @@ class App extends Component {
               handleEditFromApp={this.handleEdit}
               handleChange={this.handleChange}
               handleEditSubmit={this.handleEditSubmit}
+              handleDelete={this.handleDelete}
             />
           </div>
         </div>
