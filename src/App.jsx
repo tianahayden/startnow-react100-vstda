@@ -75,9 +75,19 @@ class ViewToDoContainer extends Component {
 
   renderToDo() {
     return this.props.items.map((e, i) => {
+      if (e.priority == '1') {
+        var className = 'list-group-item bg-danger text-white'
+      }
+      if (e.priority == '2') {
+        var className = 'list-group-item bg-warning text-white'
+      }
+      if (e.priority == '3') {
+        var className = 'list-group-item bg-success text-white'
+      }
+      
       if (e.isEditing === true) {
         return (
-          <li className='list-group-item'>
+          <li className='list-group-item' key={e.description}>
             <EditToDo
             handleChange={this.props.handleChange}
             items={this.props.items}
@@ -89,7 +99,7 @@ class ViewToDoContainer extends Component {
 
       else {
         return (
-          <li className='list-group-item'>
+          <li className={className} key={e.description}>
             <div className='row'>
               <div className='col'>
                 <input type='checkbox' />
