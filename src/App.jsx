@@ -8,18 +8,18 @@ class CreateToDo extends Component {
       <div>
         <div className='form-group'>
           <label>I want to...</label>
-          <input onChange={this.props.handleChangeFromContainer} name='description' type="text" className="form-control" />
+          <textarea onChange={this.props.handleChangeFromContainer} name='description' type="text" className="form-control create-todo-text" />
         </div>
         <div className='form-group'>
           <label>Set Priority</label>
           <br></br>
-          <select name='priority' onChange={this.props.handleChangeFromContainer}>
+          <select className='create-todo-priority' name='priority' onChange={this.props.handleChangeFromContainer}>
             <option value='1'>High</option>
             <option value='2'>Medium</option>
             <option value='3'>Low</option>
           </select>
         </div>
-        <button onClick={this.props.handleClickFromContainer}>Submit</button>
+        <button className='create-todo' onClick={this.props.handleClickFromContainer}>Submit</button>
       </div>
     )
   }
@@ -50,19 +50,19 @@ class EditToDo extends Component {
       <div>
         <div className='form-group'>
           <label>Description</label>
-          <input name='description' onChange={this.props.handleChange} type="text" className="form-control" />
+          <textarea name='description' onChange={this.props.handleChange} type="text" className="update-todo-text form-control" />
         </div>
         <div className='form-group'>
           <label>Set Priority</label>
           <br></br>
-          <select name='priority' onChange={this.props.handleChange}>
+          <select className='update-todo-priority' name='priority' onChange={this.props.handleChange}>
             <option value='1'>High</option>
             <option value='2'>Medium</option>
             <option value='3'>Low</option>
           </select>
           <div className='form-group'>
             <br></br>
-            <button onClick={this.props.handleEditSubmit} className='btn btn-primary'>Save</button>
+            <button onClick={this.props.handleEditSubmit} className='update-todo btn btn-primary'>Save</button>
           </div>
         </div>
       </div>
@@ -76,22 +76,22 @@ class ViewToDoContainer extends Component {
   renderToDo() {
     return this.props.items.map((e, i) => {
       if (e.priority == '1') {
-        var className = 'list-group-item bg-danger text-white'
+        var className = 'list-group-item bg-danger text-white success'
       }
       if (e.priority == '2') {
-        var className = 'list-group-item bg-warning text-white'
+        var className = 'list-group-item bg-warning text-white success'
       }
       if (e.priority == '3') {
-        var className = 'list-group-item bg-success text-white'
+        var className = 'list-group-item bg-success text-white success'
       }
-      
+
       if (e.isEditing === true) {
         return (
           <li className='list-group-item' key={e.description}>
             <EditToDo
-            handleChange={this.props.handleChange}
-            items={this.props.items}
-            handleEditSubmit={this.props.handleEditSubmit}
+              handleChange={this.props.handleChange}
+              items={this.props.items}
+              handleEditSubmit={this.props.handleEditSubmit}
             />
           </li>
         )
@@ -108,17 +108,25 @@ class ViewToDoContainer extends Component {
                 {e.description}
               </div>
               <div className='col'>
-                <button name={i} onClick={this.props.handleEditFromApp}>Edit</button>
+                <button className='edit-todo far fa-edit' name={i} onClick={this.props.handleEditFromApp}></button>
               </div>
               <div className='col'>
-                <button name={i} onClick={this.props.handleDelete}>Trash</button>
+                <button className='delete-todo far fa-trash-alt' name={i} onClick={this.props.handleDelete}></button>
               </div>
             </div>
           </li>
         )
       }
-
     })
+  }
+
+  renderIntro() {
+    return (
+      <div>
+        <p className='font-weight-bold text-secondary'>Welcome to the Very Simple To Do App</p>
+        <p className='text-secondary'>Get started by adding a todo item on the left.</p>
+      </div>
+    )
   }
 
   render() {
@@ -128,7 +136,7 @@ class ViewToDoContainer extends Component {
           <div className='h3'>View To Do Items</div>
           <br></br>
           <ul className='list-group'>
-            {this.props.toggleTable === true ? this.renderToDo() : null}
+            {this.props.toggleTable === true ? this.renderToDo() : this.renderIntro()}
           </ul>
         </div>
       </div>
@@ -156,7 +164,7 @@ class App extends Component {
 
   }
 
-  handleEditSubmit(){
+  handleEditSubmit() {
     var currentItems = this.state.items
     var newToDo = {
       description: this.state.description,
@@ -164,13 +172,13 @@ class App extends Component {
       isShown: true,
       isEditing: false,
     }
-    currentItems.splice((this.state.currentIndex),1,newToDo)
+    currentItems.splice((this.state.currentIndex), 1, newToDo)
 
     this.setState({
       items: currentItems
     })
   }
-  
+
 
   handleEdit(e) {
     var currentItems = this.state.items
@@ -180,7 +188,7 @@ class App extends Component {
       isShown: true,
       isEditing: true,
     }
-    currentItems.splice((e.target.name),1,editedToDo)
+    currentItems.splice((e.target.name), 1, editedToDo)
 
     this.setState({
       items: currentItems,
@@ -190,7 +198,7 @@ class App extends Component {
 
   handleDelete(e) {
     var currentItems = this.state.items
-    currentItems.splice((e.target.name),1)
+    currentItems.splice((e.target.name), 1)
 
     this.setState({
       items: currentItems,
