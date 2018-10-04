@@ -72,8 +72,26 @@ class EditToDo extends Component {
 
 
 class ViewToDoContainer extends Component {
+  constructor(props) {
+    super(props)
+    this.renderToDo = this.renderToDo.bind(this)
+    this.showSorted = this.showSorted.bind(this)
+    this.showUnsorted = this.showUnsorted.bind(this)
+    this.renderSortButton = this.renderSortButton.bind(this)
+  }
 
-  renderToDo() {
+  renderSortButton() {
+    return (
+      <div>
+        <br></br>
+        <button onClick={this.props.toggleSort}>Sort By Priority</button>
+      </div>
+    )
+  }
+
+  showSorted() {
+    this.props.items.sort((a, b) => a.priority - b.priority)
+
     return this.props.items.map((e, i) => {
       if (e.priority == '1') {
         var className = 'list-group-item bg-danger text-white success'
@@ -87,7 +105,7 @@ class ViewToDoContainer extends Component {
 
       if (e.isEditing === true) {
         return (
-          <li className='list-group-item' key={e.description}>
+          <li className='list-group-item' key={e.id}>
             <EditToDo
               handleChange={this.props.handleChange}
               items={this.props.items}
@@ -99,7 +117,7 @@ class ViewToDoContainer extends Component {
 
       else {
         return (
-          <li className={className} key={e.description}>
+          <li className={className} key={e.id}>
             <div className='row'>
               <div className='col'>
                 <input type='checkbox' />
@@ -120,6 +138,63 @@ class ViewToDoContainer extends Component {
     })
   }
 
+
+  showUnsorted() {
+    return this.props.items.map((e, i) => {
+      if (e.priority == '1') {
+        var className = 'list-group-item bg-danger text-white success'
+      }
+      if (e.priority == '2') {
+        var className = 'list-group-item bg-warning text-white success'
+      }
+      if (e.priority == '3') {
+        var className = 'list-group-item bg-success text-white success'
+      }
+
+      if (e.isEditing === true) {
+        return (
+          <li className='list-group-item' key={e.id}>
+            <EditToDo
+              handleChange={this.props.handleChange}
+              items={this.props.items}
+              handleEditSubmit={this.props.handleEditSubmit}
+            />
+          </li>
+        )
+      }
+      else {
+        return (
+          <li className={className} key={e.id}>
+            <div className='row'>
+              <div className='col'>
+                <input type='checkbox' />
+              </div>
+              <div className='col-6'>
+                {e.description}
+              </div>
+              <div className='col'>
+                <button className='edit-todo far fa-edit' name={i} onClick={this.props.handleEditFromApp}></button>
+              </div>
+              <div className='col'>
+                <button className='delete-todo far fa-trash-alt' name={i} onClick={this.props.handleDelete}></button>
+              </div>
+            </div>
+          </li>
+        )
+      }
+    })
+  }
+
+
+  renderToDo() {
+    if (this.props.isToggleSort === true) {
+      return this.showSorted()
+    }
+    else {
+      return this.showUnsorted()
+    }
+  }
+
   renderIntro() {
     return (
       <div>
@@ -138,6 +213,7 @@ class ViewToDoContainer extends Component {
           <ul className='list-group'>
             {this.props.toggleTable === true ? this.renderToDo() : this.renderIntro()}
           </ul>
+          {this.props.toggleTable === true ? this.renderSortButton() : null}
         </div>
       </div>
     )
@@ -153,19 +229,28 @@ class App extends Component {
       items: [],
       isToggleTable: false,
       currentIndex: '',
+      isToggleSort: false,
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.toggleTable = this.toggleTable.bind(this);
+    this.toggleSort = this.toggleSort.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
 
   }
 
+  toggleSort() {
+    this.setState({
+      isToggleSort: !this.state.isToggleSort
+    });
+  }
+
+
   handleEditSubmit() {
-    var currentItems = this.state.items
+    var currentItems = this.state.items.slice()
     var newToDo = {
       description: this.state.description,
       priority: this.state.priority,
@@ -181,7 +266,7 @@ class App extends Component {
 
 
   handleEdit(e) {
-    var currentItems = this.state.items
+    var currentItems = this.state.items.slice()
     var editedToDo = {
       description: this.state.items[(e.target.name)].description,
       priority: this.state.items[(e.target.name)].priority,
@@ -197,7 +282,7 @@ class App extends Component {
   }
 
   handleDelete(e) {
-    var currentItems = this.state.items
+    var currentItems = this.state.items.slice()
     currentItems.splice((e.target.name), 1)
 
     this.setState({
@@ -220,6 +305,7 @@ class App extends Component {
       priority: this.state.priority,
       isShown: true,
       isEditing: false,
+      id: this.state.items.length
     };
     this.setState({
       items: this.state.items.concat(newToDo)
@@ -259,6 +345,8 @@ class App extends Component {
               handleChange={this.handleChange}
               handleEditSubmit={this.handleEditSubmit}
               handleDelete={this.handleDelete}
+              toggleSort={this.toggleSort}
+              isToggleSort={this.state.isToggleSort}
             />
           </div>
         </div>
